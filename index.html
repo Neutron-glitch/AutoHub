@@ -59,14 +59,21 @@
           <!-- <div class="shape"></div>
                 <div class="shape"></div> -->
         </div>
-        <form class="Login-form" action="home.html">
+        <% if(session.user_id) { %>
+
+          <h1>Hi User, Welcome</h1>
+
+          <a href="/logout" class="btn btn-primary">Logout</a>
+
+      <% } else { %>
+        <form method ="post" class="Login-form" action="/login">
           <h3>Login Here</h3>
 
           <label for="username">Username</label>
-          <input type="text" placeholder="Username" id="username">
+          <input type="text" name="user_email_address" placeholder="Username" id="username">
 
           <label class="Login-label" for="password">Password</label>
-          <input type="password" placeholder="Password" id="password">
+          <input type="password" name="user_password" placeholder="Password" id="password">
 
           <label for="cars" >Choose a user:</label>
           <select id="cars" name="cars">
@@ -79,6 +86,7 @@
         </form>
       </div>
     </div>
+    <% } %>
 
   </section>
 
