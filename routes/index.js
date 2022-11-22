@@ -64,6 +64,16 @@ router.get('/register', (req, res) => {
     res.render('pages/Register_As_Car_Owner.ejs', { title: 'Express', session: req.session });
 })
 
+router.get('/maps', (req, res) => {
+    console.log('register hit');
+    res.render('pages/maps.ejs', { title: 'Express', session: req.session });
+})
+
+router.get('/mappo', (req, res) => {
+    console.log('register hit');
+    res.render('pages/mappo.ejs', { title: 'Express', session: req.session });
+})
+
 router.post('/register_user', async (req, res) => {
     console.log(req.body);
     // var user_email_address = req.body.user_email_address;
@@ -117,6 +127,8 @@ router.post('/register_user', async (req, res) => {
         res.send('Incomplete Registration');
     }
 })
+
+
 
 
 module.exports = router;
