@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Autohub</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Pacifico&family=Play&family=Sawarabi+Mincho&family=Ubuntu:wght@300&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- <link rel="stylesheet" href="/css/templatemo-ocean-vibes.css"> -->
+
+</head>
+
+<body onload="sortOnLoad()">
+
+  <section id="title">
+
+
+    <!-- Nav Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a id="Knapsack" class="navbar-brand" style="padding: 0 15px;" href="/uProfile">Autohub</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/uProfile"><%= data.profileName %></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="carowner_appointments.html">Completed Appointments</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="search_services.html">Search Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="search_parts.html">Search Parts</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Logout</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="" role="button" data-bs-toggle="dropdown" aria-expanded="false">More</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="About-Us.html">About Us</a></li>
+              <li><a class="dropdown-item" href="About-Us.html">About Us</a></li>
+
+              <!--  <li><a class="dropdown-item" href="">FAQ</a></li> -->
+
+              <li><a class="dropdown-item" href="Contact.html">Contact Us</a></li>
+
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <section class="vh-100" style="background-color:  #ade8f4;">
+      <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="col col-lg-6 mb-4 mb-lg-0">
+            <div class="card mb-3" style="border-radius: .5rem;">
+              <div class="row g-0">
+                <div class="col-md-4 gradient-custom text-center text-white" style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem; background-color: blueviolet;">
+                  <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" alt="Avatar" class="img-fluid my-5" style="width: 80px;" />
+                  <h5><%= data.profileName %></h5>
+                  <p>___</p>
+                  <i class="far fa-edit mb-5"></i>
+                </div>
+                <div class="col-md-8">
+                  <div class="card-body p-4">
+                    <h6>Description</h6>
+                    <p class="text-muted"><%= data.description %></p>
+                    <hr class="mt-0 mb-4">
+                    <div class="row pt-1">
+                      <div class="col-6 mb-3">
+                        <h6>Email</h6>
+                        <p class="text-muted"><%= data.email %></p>
+                      </div>
+                      <!-- <div class="col-6 mb-3">
+                                            <h6>Phone</h6>
+                                            <p class="text-muted">123 456 789</p>
+                                        </div> -->
+                    </div>
+                    <!--  <h6>Stuff</h6> -->
+                    <hr class="mt-0 mb-4">
+                    <div class="row pt-1">
+                      <div class="col-6 mb-3">
+                        <h6>Services Taken</h6>
+                        <p class="text-muted">#services</p>
+                      </div>
+                      <div class="col-6 mb-3">
+                        <h6>Current Appointment</h6>
+                        <p class="text-muted">#Date and Price</p>
+                      </div>
+                    </div>
+                    <!-- <div class="d-flex justify-content-start">
+                                        <a href="#!"><i class="fab fa-facebook-f fa-lg me-3"></i></a>
+                                        <a href="#!"><i class="fab fa-twitter fa-lg me-3"></i></a>
+                                        <a href="#!"><i class="fab fa-instagram fa-lg"></i></a>
+                                    </div> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+
+
+
+
+
+    <div class="card">
+      <div class="card-header">
+        <div class="row">
+          <div class="col">Current Appoinments</div>
+          <div class="col"></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table rules=none class="table table-bordered problem-table">
+            <tr>
+              <th colspan="2" style="text-align: center;">Workshop Name</th>
+              <!-- <th></th> -->
+              <th>Service</th>
+              <th>Parts</th>
+              <th>Price</th>
+            </tr>
+
+            <tr>
+              <td><a href="<%= data.link %>"><%= data.name %></a></td>
+              <td>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+                  <label class="form-check-label" for="inlineCheckbox1">
+                    <p>Completed</p>
+                  </label>
+                </div>
+              </td>
+              <td><%= data.website%></td>
+              <td><%= data.category%></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td colspan="5">No Appointments Found</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/category.js"></script>
+    <script src="/js/sort.js"></script>
+    <footer id="footer">
+
+      <!--  <p style="text-align: center;">© Copyright Knapsack</p>  -->
+
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+</body>
+
+</html>
