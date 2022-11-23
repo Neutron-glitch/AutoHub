@@ -1,0 +1,152 @@
+<html>
+
+<head>
+    <title>Custom Markers</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/test.css" />
+    <script type="module" src="./index.js"></script>
+</head>
+
+<body>
+    <div id="markers">
+        <u><b>Marker types</b></u><br>
+        <b>Workshops : </b>
+        <img src="http://127.0.0.1:3002/resource/w_logo.png" alt="workshop" width="20" height="20"> <br>
+        <b>I am batman </b>
+        <img src="http://127.0.0.1:3002/resource/batman.png" alt="batman" width="20" height="20"> <br>
+
+    </div> 
+
+    <div id="map"></div>
+
+
+    <script>
+        console.log("Start web server for Chrome to work");
+
+        let map;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: new google.maps.LatLng(-33.91722, 151.23064),
+                zoom: 16,
+            });
+
+            const iconBase = "http://127.0.0.1:3002/resource/"
+                //"https://developers.google.com/maps/documentation/javascript/examples/full/images/";
+            const icons = {
+                parking: {
+                    icon: iconBase + "w_logo.png",
+                },
+                library: {
+                    icon: iconBase + "white_loo.png",
+                },
+                info: {
+                    icon: iconBase + "batman.png",
+                },
+            };
+            const features = [
+                {
+                    position: new google.maps.LatLng(-33.91721, 151.2263),
+                    type: "info",
+                },
+                {
+                    position: new google.maps.LatLng(-33.91539, 151.2282),
+                    type: "info",
+                },
+                {
+                    position: new google.maps.LatLng(-33.91747, 151.22912),
+                    type: "info",
+                },
+                {
+                    position: new google.maps.LatLng(-33.9191, 151.22907),
+                    type: "info",
+                },
+                {
+                    position: new google.maps.LatLng(-33.91725, 151.23011),
+                    type: "info",
+                },
+                {
+                    position: new google.maps.LatLng(-33.91872, 151.23089),
+                    type: "info",
+                },
+                {
+                    position: new google.maps.LatLng(-33.91784, 151.23094),
+                    type: "info",
+                },
+                {
+                    position: new google.maps.LatLng(-33.91682, 151.23149),
+                    type: "info",
+                },
+                {
+                    position: new google.maps.LatLng(-33.9179, 151.23463),
+                    type: "info",
+                },
+                {
+                    position: new google.maps.LatLng(-33.91666, 151.23468),
+                    type: "info",
+                },
+                {
+                    position: new google.maps.LatLng(-33.916988, 151.23364),
+                    type: "info",
+                },
+                {
+                    position: new google.maps.LatLng(-33.91662347903106, 151.22879464019775),
+                    type: "parking",
+                },
+                {
+                    position: new google.maps.LatLng(-33.916365282092855, 151.22937399734496),
+                    type: "parking",
+                },
+                {
+                    position: new google.maps.LatLng(-33.91665018901448, 151.2282474695587),
+                    type: "parking",
+                },
+                {
+                    position: new google.maps.LatLng(-33.919543720969806, 151.23112279762267),
+                    type: "parking",
+                },
+                {
+                    position: new google.maps.LatLng(-33.91608037421864, 151.23288232673644),
+                    type: "parking",
+                },
+                {
+                    position: new google.maps.LatLng(-33.91851096391805, 151.2344058214569),
+                    type: "parking",
+                },
+                {
+                    position: new google.maps.LatLng(-33.91818154739766, 151.2346203981781),
+                    type: "parking",
+                },
+                {
+                    position: new google.maps.LatLng(-33.91727341958453, 151.23348314155578),
+                    type: "library",
+                },
+            ];
+
+            // Create markers.
+            for (let i = 0; i < features.length; i++) {
+                const marker = new google.maps.Marker({
+                    position: features[i].position,
+                    icon: icons[features[i].type].icon,
+                    map: map,
+                });
+            }
+        }
+
+        window.initMap = initMap;
+
+    </script>
+
+    <!-- 
+     The `defer` attribute causes the callback to execute after the full HTML
+     document has been parsed. For non-blocking uses, avoiding race conditions,
+     and consistent behavior across browsers, consider loading using Promises
+     with https://www.npmjs.com/package/@googlemaps/js-api-loader.
+    -->
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8vHaaS6apZ1pI7uKyZalr6auRzJ0NuEk&callback=initMap&v=weekly"
+        defer></script>
+</body>
+
+</html>

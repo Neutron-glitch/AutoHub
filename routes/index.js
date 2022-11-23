@@ -74,6 +74,11 @@ router.get('/mappo', (req, res) => {
     res.render('pages/mappo.ejs', { title: 'Express', session: req.session });
 })
 
+router.get('/map3', (req, res) => {
+    console.log('register hit');
+    res.render('pages/custom_markers.ejs', { title: 'Express', session: req.session });
+})
+
 router.post('/register_user', async (req, res) => {
     console.log(req.body);
     // var user_email_address = req.body.user_email_address;
