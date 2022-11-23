@@ -53,6 +53,12 @@ p {
 .navbar-brand {
   font-family: 'Montserrat', cursive;
   font-size: 3em;
+
+}
+
+
+.navbar{
+  background-color: #2dbbd1;
 }
 
 .nav-item {
