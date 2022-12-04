@@ -161,16 +161,16 @@ app.post('/search_services_post', async (req,res)=>{
 	var {service_name}=req.body
 	console.log(req.body)
 	const email=req.session.email
-	//  connection.query('Select workshops.name, services.workshop_email,services.price,services.details,services.availability from services inner join workshops on workshops.email=services.workshop_email where services.s_name=?',[service_name],(error,results,fields)=>{
-	// 	if(error) throw error
-	// 	if(results.length === 0){
-	// 		res.render('search_services',{ service_name: service_name,services:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"F" })
-	// 	}
-	// 	else{
-	// 		console.log(results)
-	// 		res.render('search_services',{service_name: service_name,services:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"S" })
-	// 	}
-	// })
+	 connection.query('Select workshops.name, services.workshop_email,services.price,services.details,services.availability from services inner join workshops on workshops.email=services.workshop_email where services.s_name=?',[service_name],(error,results,fields)=>{
+		if(error) throw error
+		if(results.length === 0){
+			res.render('search_services',{ service_name: service_name,services:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"F" })
+		}
+		else{
+			console.log(results)
+			res.render('search_services',{service_name: service_name,services:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"S" })
+		}
+	})
 	
 })
 app.get('/create_appointment', (req, res) => {
