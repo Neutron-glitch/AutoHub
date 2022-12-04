@@ -1,4 +1,15 @@
 
+
+.drop_down{
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 1.2rem;
+  border: 1px solid #D5D6D7;
+  box-sizing: border-box;
+  padding: 15px;
+  width: 100%;
+  background-color: #cf6324;
+  border-radius: 5px;
+}
 .select_box1{
   background-color: rgb(43, 194, 236);
   border-radius: 5px;
@@ -205,9 +216,9 @@ p{
   width: 380px;
 }
 
-.container-sm {
+/* .container-sm {
   margin : 100px 250px;
-}
+} */
 
 .container-sm a{
   text-decoration: none;

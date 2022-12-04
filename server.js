@@ -11,9 +11,9 @@ const app = express()
 
 
 const connection = mysql.createConnection({
-	host     : 'localhost',
-	user     : 'root',
-	database : 'ver1',
+	host: 'localhost',
+	user: 'root',
+	database: 'ver1',
 	multipleStatements: true,
 	port: 3307
 });
@@ -34,549 +34,435 @@ app.use(express.static(path.join(__dirname, './public/js')));
 
 app.set('view engine', 'ejs')
 
-app.get('/uProfile', (req, res)=>{
-	if(req.session.loggedin) res.render('uProfile', {data:{profileName: req.session.name}});
+
+app.get('/home', (req, res) => {
+	if (req.session.loggedin) res.render('wProfile', {profileName: req.session.name, email: req.session.email });
 	else res.render('login')
 })
-app.get('/wProfile', (req, res)=>{
-	if(req.session.loggedin) res.render('wProfile', {data:{profileName: req.session.name}});
-	else res.render('login')
+
+
+app.get('/add_parts', (req, res) => {
+	if (req.session.loggedin) {
+		connection.query('SELECT * FROM parts_list', (err,results)=>{
+			if(err) throw err
+			let profile = req.session.name
+			res.render('practice-add_parts',{ profileName: profile, parts: results,prob:""})
+		})
+	}
+	else res.render('index')
 })
-app.get
-app.get('/', (req, res)=>{
-	res.render('index')
+app.post('/add_parts_post', async (req,res)=>{
+	var {ID,manufacturer,price,quantity,details}=req.body
+	const email=req.session.email
+	var present=0
+	var part_name
+	 connection.query('Select * from parts where `parts_id`=? AND `workshop_email`=?',[ID,email],(error,results,fields)=>{
+		if(error) throw error
+		if(results.length > 0){
+			res.render('practice-add_parts',{profileName:"",prob :"F" })
+		}
+		else{
+			connection.query('Select name from parts_list where ID=?',[ID],(error,results,fields)=>{
+				if(error) throw error
+				else if(results.length > 0){
+					part_name=results[0].name
+					console.log(results[0].name)
+					console.log("name got")
+					connection.query('Insert into parts set ?',{parts_id:ID, workshop_email:email,manufacturer:manufacturer,p_name:part_name,price:price,quantity:quantity,details:details},(err,results,fields)=>{
+						if(err){
+							return connection.rollback(function() {
+								throw err;
+							});
+						}
+					})
+
+					res.render('wProfile',{profileName:req.session.name, email: req.session.email,mobile:req.session.mobile,prob:"S"})
+				}
+			})
+		}
+	})
+	
+})
+app.get('/add_services', (req, res) => {
+	if (req.session.loggedin) {
+		connection.query('SELECT * FROM services_list', (err,results)=>{
+			if(err) throw err
+			let profile = req.session.name
+			res.render('practice-add_services',{ profileName: profile, services: results,prob:""})
+		})
+	}
+	else res.render('index')
+})
+app.post('/add_services_post', async (req,res)=>{
+	var {ID,price,details}=req.body
+	const email=req.session.email
+	var service_name
+	 connection.query('Select * from services where `service_id`=? AND `workshop_email`=?',[ID,email],(error,results,fields)=>{
+		if(error) throw error
+		if(results.length > 0){
+			res.render('practice-add_services',{profileName:req.session.name,services:"",prob :"FF" })
+		}
+		else{
+			connection.query('Select name from services_list where ID=?',[ID],(error,results,fields)=>{
+				if(error) throw error
+				else if(results.length > 0){
+					service_name=results[0].name
+					console.log(results[0].name)
+					console.log("name got")
+					const available=1
+					connection.query('Insert into services set ?',{service_id:ID, workshop_email:email,s_name:service_name,price:price,details:details,availability:available},(err,results,fields)=>{
+						if(err){
+							return connection.rollback(function() {
+								throw err;
+							});
+						}
+					})
+					res.render('wProfile',{profileName:req.session.name, email: req.session.email,mobile:req.session.mobile,prob:"SS"})
+				}
+			})
+		}
+	})
+	
+})
+app.get('/search_parts', (req, res) => {
+	if (req.session.loggedin) {
+		let profile=req.session.name
+		res.render('search_parts',{ part_name:"",profileName: profile, parts:"",prob:""})
+	}
+	else res.render('index')
+})
+app.post('/search_parts_post', async (req,res)=>{
+	console.log("post hit")
+	var {part_name}=req.body
+	console.log(req.body)
+	const email=req.session.email
+	 connection.query('Select workshops.name, parts.workshop_email,parts.manufacturer,parts.p_name,parts.price,parts.quantity,parts.details from parts inner join workshops on workshops.email=parts.workshop_email where parts.p_name=?',[part_name],(error,results,fields)=>{
+		
+		if(error) throw error
+		if(results.length === 0){
+			res.render('search_parts',{part_name:part_name,parts:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"F" })
+		}
+		else{
+			console.log(results)
+			res.render('search_parts',{part_name:part_name,parts:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"S" })
+		}
+	})
+	
+})
+app.get('/search_services', (req, res) => {
+	if (req.session.loggedin) {
+		let profile=req.session.name
+		res.render('search_services',{ service_name:"",profileName: profile, services:"",prob:""})
+	}
+	else res.render('index')
+})
+app.post('/search_services_post', async (req,res)=>{
+	console.log("post hit")
+	var {service_name}=req.body
+	console.log(req.body)
+	const email=req.session.email
+	//  connection.query('Select workshops.name, services.workshop_email,services.price,services.details,services.availability from services inner join workshops on workshops.email=services.workshop_email where services.s_name=?',[service_name],(error,results,fields)=>{
+	// 	if(error) throw error
+	// 	if(results.length === 0){
+	// 		res.render('search_services',{ service_name: service_name,services:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"F" })
+	// 	}
+	// 	else{
+	// 		console.log(results)
+	// 		res.render('search_services',{service_name: service_name,services:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"S" })
+	// 	}
+	// })
+	
+})
+app.get('/create_appointment', (req, res) => {
+	if (req.session.loggedin){
+		var {service_name}=req.body
+		console.log(req.body)
+		const email=req.session.email
+		 connection.query('Select * from services',(error,results,fields)=>{
+			if(error) throw error
+			if(results.length === 0){
+				res.render('create_appointment',{ service_name: service_name,services:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"F" })
+			}
+			else{
+				console.log(results)
+				res.render('create_appointment',{service_name: service_name,services:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"S" })
+			}
+		})
+	}
+	else res.render('login',{prob:""})
+})
+app.post('/create_appointment_post', async (req,res)=>{
+	console.log("post hit")
+	var {service_name}=req.body
+	console.log(req.body)
+	const email=req.session.email
+	 connection.query('Select * from services where name=?',[service_name],(error,results,fields)=>{
+		if(error) throw error
+		if(results.length === 0){
+			res.render('search_services',{ service_name: service_name,services:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"F" })
+		}
+		else{
+			console.log(results)
+			res.render('search_services',{service_name: service_name,services:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"S" })
+		}
+	})
+	
+})
+app.get('/edit_parts', (req, res) => {
+	if (req.session.loggedin) {
+		let profile=req.session.name
+		res.render('edit_parts',{ part_name:"",profileName: profile, parts:"",prob:""})
+	}
+	else res.render('index')
+})
+app.post('/edit_parts_post', async (req,res)=>{
+	console.log("post hit")
+	var {manufacturer,name,price,quantity,details}=req.body
+	console.log(req.body)
+	const email=req.session.email
+	 connection.query('Select * from parts where p_name=? AND workshop_email=?',[name,email],(error,results,fields)=>{
+		if(error) throw error
+		if(results.length === 0){
+			res.render('/edit_parts',{part_name:part_name,parts:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"F" })
+		}
+		else{
+			console.log(results)
+			connection.query('UPDATE parts set manufacturer=?, price=?,quantity=?,details=? where p_name=? AND workshop_email=?',[manufacturer,price,quantity,details,name,email], (error,results,fields)=>{
+				if(error) throw error
+				if(results.length===0){
+					res.render('edit_parts',{parts:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"FF" })
+				}
+				else{
+					res.render('edit_parts',{parts:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"S" })
+				}
+			})
+		}
+	})
+	
 })
 
-app.get('/login', (req, res)=>{
-    res.render('login', {prob:""})
+app.get('/delete_parts', (req, res) => {
+	if (req.session.loggedin) {
+		let profile=req.session.name
+		res.render('delete_parts',{ part_name:"",profileName: profile, parts:"",prob:""})
+	}
+	else res.render('index')
+})
+app.post('/delete_parts_post', async (req,res)=>{
+	console.log("post hit")
+	var {name}=req.body
+	console.log(req.body)
+	const email=req.session.email
+	 connection.query('Select * from parts where p_name=? AND workshop_email=?',[name,email],(error,results,fields)=>{
+		if(error) throw error
+		if(results.length === 0){
+			res.render('/delete_parts',{part_name:part_name,parts:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"F" })
+		}
+		else{
+			console.log(results)
+			connection.query('DELETE FROM parts where p_name=? AND workshop_email=?',[name,email], (error,results,fields)=>{
+				if(error) throw error
+				if(results.length===0){
+					res.render('delete_parts',{parts:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"FF" })
+				}
+				else{
+					res.render('delete_parts',{parts:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"S" })
+				}
+			})
+		}
+	})
+	
 })
 
-app.get('/register', (req, res)=>{
-    res.render('register', {prob:""})
+
+app.get('/uProfile', (req, res) => {
+	if (req.session.loggedin) res.render('uProfile', { data: { profileName: req.session.name, email: req.session.email,mobile:req.session.mobile },prob:"" });
+	else res.render('login',{prob:""})
+})
+app.get('/wProfile', (req, res) => {
+	if (req.session.loggedin) {
+		const email = req.session.email
+		connection.query('select COUNT(service_id) from services where workshop_email=?',[email],(error,results,fields)=>{
+			if(error) throw error
+			console.log(results)
+			let services_num=Object.values(results[0])[0]
+			console.log(services_num)
+			res.render('wProfile', {  profileName: req.session.name, email: req.session.email,mobile:req.session.mobile,num:services_num,prob:"" });
+		})
+
+	}
+	else res.render('login',{prob:""})
+})
+app.get('/contact_us',(req,res)=>{
+	res.render('about-us');
+})
+app.get('/', (req, res) => {
+	res.render('index',{prob:""})
 })
 
-app.get('/registerW', (req,res)=>{
-	res.render('registerW',{prob:""})
+app.get('/login', (req, res) => {
+	res.render('login', { prob: "" })
 })
 
-app.post('/auth', async function(request, response) {
+app.get('/register', (req, res) => {
+	res.render('register', { prob: "" })
+})
+
+app.get('/registerW', (req, res) => {
+	res.render('registerW', { prob: "" })
+})
+
+app.get('/logout', (req, res) => {
+	req.session.destroy(function (err) {
+		res.redirect('/'); //Inside a callback… bulletproof!
+	});
+})
+
+
+app.post('/auth', async function (request, response) {
 
 	// Capture the input fields
-	const {email, password, selectBox} = request.body;
+	const { email, password, selectBox } = request.body;
 
 	// Ensure the input fields exists and are not empty
 	if (email && password) {
 
 		// Execute SQL query that'll select the account from the database based on the specified username and password
-		if(selectBox === 'car_owner'){
-			
-		connection.query('SELECT * FROM users WHERE email = ?', [email], async function(error, results, fields) {
-			// If there is an issue with the query, output the error
-			if (error) throw error;
+		if (selectBox === 'car_owner') {
 
-			// If the account exists
-			if (results.length > 0 && await bcrypt.compare(password, results[0].password)) {
-				
-				// Authenticate the user
-				request.session.loggedin = true;
-				request.session.name = results[0].name;
-				request.session.email = email;
-				request.session.address = results[0].address;
-				response.redirect('/uProfile')
-			} else {
-				
-				response.render('login', {prob:"incorrect"})
-			}			
-			response.end();
-		});
-	}
-	else{
-		connection.query('SELECT * FROM workshops WHERE email = ?', [email], async function(error, results, fields) {
-			// If there is an issue with the query, output the error
-			if (error) throw error;
-			// If the account exists
-			if (results.length > 0 && await bcrypt.compare(password, results[0].password)) {
-				
-				// Authenticate the user
-				request.session.loggedin = true;
-				request.session.name = results[0].name;
-				request.session.email = email;
-				request.session.address = results[0].address;
-				response.redirect('/wProfile')
-			} else {
-				
-				response.render('login', {prob:"incorrect"})
-			}			
-			response.end();
-		});
+			connection.query('SELECT * FROM users WHERE email = ?', [email], async function (error, results, fields) {
+				// If there is an issue with the query, output the error
+				if (error) throw error;
 
-	}
+				// If the account exists
+				if (results.length > 0 && await bcrypt.compare(password, results[0].password)) {
+
+					// Authenticate the user
+					request.session.loggedin = true;
+					request.session.name = results[0].name;
+					request.session.email = email;
+					request.session.address = results[0].address;
+					request.session.mobile = results[0].mobile
+					response.redirect('/uProfile')
+				} else {
+
+					response.render('login', { prob: "incorrect" })
+				}
+				response.end();
+			});
+		}
+		else {
+			connection.query('SELECT * FROM workshops WHERE email = ?', [email], async function (error, results, fields) {
+				// If there is an issue with the query, output the error
+				if (error) throw error;
+				// If the account exists
+				if (results.length > 0 && await bcrypt.compare(password, results[0].password)) {
+
+					// Authenticate the user
+					request.session.loggedin = true;
+					request.session.name = results[0].name;
+					request.session.email = email;
+					request.session.address = results[0].address;
+					request.session.mobile = results[0].mobile
+					response.redirect('/wProfile')
+				} else {
+
+					response.render('login', { prob: "incorrect" })
+				}
+				response.end();
+			});
+
+		}
 	} else {
-		response.render('login', { prob : "details" })
+		response.render('login', { prob: "details" })
 		response.end();
 	}
 });
 
-app.post('/reg', async (req, res)=>{
+app.post('/reg', async (req, res) => {
 	console.log(req.body);
-	const {name, email, password, passwordConfirm, mobile, address} = req.body;
+	const { name, email, password, passwordConfirm, mobile, address } = req.body;
 	if (name && email && password && passwordConfirm) {
 		connection.query('SELECT email from users WHERE email = ?', [email], async (err, results) => {
-				if (err) {
-					console.log(err);
-				} 
-				else {
-					if (results.length > 0) {
-						// res.send('Email already registered!')
-						res.render('register', { prob : "email" })
-						res.end();
-					} else if (password != passwordConfirm) {
-						// res.send('Passwords do not match!')
-						res.render('register', { prob : "pass" })
-						res.end();
-					}
-					else {
-						let hashedPassword = await bcrypt.hash(password, 8);
-							console.log(hashedPassword);
-
-						connection.query('INSERT INTO users SET ?', {name:name, email: email, password: hashedPassword, mobile:mobile, address: address }, (err, results) => {
-							if (err) {
-								console.log(err);
-							} else {
-								// res.send('User registered');
-								res.render('login', {prob:"success"})
-								res.end();
-							}
-						})
-					}
-				}
-			}
-		)
-	}
-	else{
-		res.render('register', { prob : "details" })
-	}
-})
-
-app.post('/regW', async (req, res)=>{
-	console.log(req.body);
-	const {name, email, password, passwordConfirm, mobile, district, area, address_details} = req.body;
-	if (name && email && password && passwordConfirm && mobile && district && area && address_details) {
-		connection.query('SELECT email from workshops WHERE email = ?', [email], async (err, results) => {
-				if (err) {
-					console.log(err);
-				} 
-				else {
-					if (results.length > 0) {
-						// res.send('Email already registered!')
-						res.render('register', { prob : "email" })
-						res.end();
-					} else if (password != passwordConfirm) {
-						// res.send('Passwords do not match!')
-						res.render('register', { prob : "pass" })
-						res.end();
-					}
-					else {
-						let hashedPassword = await bcrypt.hash(password, 8);
-							console.log(hashedPassword);
-
-						connection.query('INSERT INTO workshops SET ?', {name:name, email: email, mobile:mobile ,password: hashedPassword, district: district, area: area, address_details: address_details }, (err, results) => {
-							if (err) {
-								console.log(err);
-							} else {
-								// res.send('Workshop registered');
-								res.render('login', {prob:"success"})
-								res.end();
-							}
-						})
-					}
-				}
-			}
-		)
-	}
-	else{
-		res.render('register', { prob : "details" })
-	}
-})
-// app.get("/problems", function(request, response){
-// 	connection.query("SELECT * FROM problems ORDER BY id DESC", function(error, data){
-// 		if(error) throw error; 
-// 		else
-// 		{
-// 			connection.query('SELECT * FROM solvedby', (err, results)=>{
-// 				if(err) throw err
-// 				console.log(results);
-// 				profile = request.session.name
-// 				response.render('sample_data', { title : 'Problems', action: 'List', sampleData: data, profileName: profile, solvecount: results});
-// 			})
-// 		}
-// 	})
-// });
-
-app.get('/problems', (req, res)=>{
-	connection.query('SELECT problemID FROM solve WHERE userID=?',  [req.session.userid], (err, solvedID)=>{
-		let solved = []
-		for(let i=0; i<solvedID.length; i++) solved.push(solvedID[i].problemID)
-		
-		var sql = `SELECT * FROM problems WHERE id IN ('${solved.join("','")}') ORDER BY id DESC`
-		connection.query(sql, (err, solve)=>{
-			var sql1 = `SELECT * FROM problems WHERE id NOT IN ('${solved.join("','")}') ORDER BY id DESC`
-			connection.query(sql1, (err, unsolved)=>{
-				connection.query(`SELECT * FROM solvedby WHERE problemID IN ('${solved.join("','")}') ORDER BY problemID DESC`, (err, ssc)=>{
-					connection.query(`SELECT * FROM solvedby WHERE problemID NOT IN ('${solved.join("','")}') ORDER BY problemID DESC`, (err, usc)=>{
-						let profile = req.session.name
-						res.render('sample_data', { title : 'Problems', action: 'List', solve: solve, unsolved: unsolved, ssc: ssc, usc: usc, profileName: profile})
-					})
-				})
-			})
-		})
-	})
-})
-
-
-// app.post('/test', async (req, res)=>{
-// 	const {link} = req.body
-// 	const ci = link.slice(-6)
-// 	const index = ci.slice(-1)
-// 	const contest = ci.substring(0, 4)
-// 	// console.log(index);
-// 	// console.log(contest);
-// 	url = "https://codeforces.com/api/problemset.problems"
-// 	https.get(url, (response)=>{
-// 		let body = ''
-// 		response.on('data', (data)=>{
-// 			body += data
-// 		})
-// 		response.on('end', ()=>{
-// 			const problems = JSON.parse(body)
-// 			// console.log(contest);
-// 			for(let i=0; i<problems.result.problems.length; i++)
-// 			{
-// 				if(problems.result.problems[i].contestId==contest && problems.result.problems[i].index==index)
-// 				{
-// 					console.log(problems.result.problems[i].name);
-// 					break
-// 				}
-// 			}
-// 		})
-// 	})
-// })
-
-app.get('/leaderboards', (req, res)=>{
-	connection.query('SELECT * FROM users ORDER BY solved DESC', (err, results)=>{
-		if(err) throw err
-		let profile = req.session.name 
-		res.render('leaderboards', {user: results, title: 'Leaderboards', profileName: profile})
-	})
-})
-
-// app.get('/test', (req, res)=>{
-// 	connection.query('SELECT * FROM problems', function(err, result1) {
-// 		let a = []
-// 		for(let i=0; i<result1.length; i++)
-// 			connection.query('SELECT count(userID) as sc FROM solve WHERE problemID=?',[req.session.userid], function(err, result2) {
-// 				a.push(result2)
-// 		});
-// 	  });
-// 	  console.log(a);
-// 	  res.render('test', { problems: result1, solved : a });
-// })
-
-app.post("/problems", (req, res)=>{
-	const probid = req.body.probid;
-	console.log(probid);
-	connection.beginTransaction(function(err) {
-		if (err) { throw err; }
-		console.log(probid);
-		connection.query('INSERT INTO solve SET ?', {userID: req.session.userid, problemID: probid}, function (error, results, fields) {
-		  if (error) {
-			return connection.rollback(function() {
-			  throw error;
-			});
-		  }
-		  connection.query('UPDATE users SET solved=solved+1 WHERE id=?', req.session.userid, function (error, results, fields) {
-			if (error) {
-			  return connection.rollback(function() {
-				throw error;
-			  });
-			}
-			connection.query('UPDATE solvedby SET solveCount=solveCount+1 WHERE problemID=?', [probid], function (error, results, fields) {
-				if (error) {
-				  return connection.rollback(function() {
-					throw error;
-				  });
-				}
-				connection.commit(function(err) {
-					if (err) {
-						return connection.rollback(function() {
-						throw err;
-						});
-					}
-					console.log('success!');
-				});
-		  	});
-		});
-		res.redirect('/problems')
-	  });
-	})
-})
-
-app.get('/add', (req, res)=>{
-	res.render('add', {data:{profileName: req.session.name}})
-})
-
-app.post('/add', (req, res)=>{
-	const {link} = req.body;
-	// const ci = link.slice(-6)
-	// const index = ci.slice(-1)
-	// const contest = ci.substring(0, 4)
-	let contest = ''
-	let ci = ''
-	let index = ''
-	let pid = ''
-	let website = ''
-	let name = ''
-	let category = ''
-	let difficulty = ''
-	if (link) {
-		if(link.includes('codeforces')){
-			website = 'Codeforces'
-			ci = link.slice(-6)
-			index = ci.slice(-1)
-			contest = ci.substring(0, 4)
-		} 
-		else if(link.includes('onlinejudge')){
-			website = 'UVA Online Judge'
-			category = 'data structures'
-			pid = link.slice(-2)
-		}
-		else if(link.includes('topcoder')) website = 'Topcoder'
-		else if(link.includes('codechef')) website = 'Codechef'
-		connection.query('SELECT link from problems WHERE link = ?', [link], async (err, results) => {
-				if (err) {
-					console.log(err);
-				}
-				else if (results.length > 0){
-					console.log(results);
-					res.render('add', {data:{profileName: req.session.name, prob: "empty"}})
-				}
-				else {
-					if(website == 'Codeforces')
-					{
-						url = "https://codeforces.com/api/problemset.problems"
-						https.get(url, (response)=>{
-						let body = ''
-						response.on('data', (data)=>{
-							body += data
-						})
-						response.on('end', ()=>{
-							const problems = JSON.parse(body)
-							probs = problems.result.problems
-							// console.log(contest);
-							for(let i=0; i<probs.length; i++)
-							{
-								if(probs[i].contestId==contest && probs[i].index==index)
-								{
-									name = probs[i].name
-									category = probs[i].tags[1]
-									console.log(category);
-									if(probs[i].rating>=800 && probs[i].rating<1000) difficulty = 'Newbie'
-									else if(probs[i].rating>=1000 && probs[i].rating<1200) difficulty = 'Novice'
-									else if(probs[i].rating>=1200 && probs[i].rating<1400) difficulty = 'Apprentice'
-									else if(probs[i].rating>=1400 && probs[i].rating<1600) difficulty = 'Specialist'
-									else if(probs[i].rating>=1600 && probs[i].rating<1800) difficulty = 'Expert'
-									else if(probs[i].rating>1800) difficulty = 'Master'
-									// console.log(problems.result.problems[i].name);
-									break
-								}
-							}
-							connection.beginTransaction((err)=>{
-								if(err) throw err
-								connection.query('INSERT INTO problems SET ?', {name: name, link: link, website: website, category: category, Difficulty: difficulty}, function (error, results, fields) {
-									if (error) {
-									  return connection.rollback(function() {
-										throw error;
-									  });
-									}
-									connection.query('INSERT INTO solvedby SET solveCount=0', (err)=>{
-										if (error) {
-											return connection.rollback(function() {
-											  throw error;
-											});
-										}
-										connection.commit(function(err) {
-											if (err) {
-													return connection.rollback(function() {
-													throw err;
-												});
-											}
-											console.log('success!');
-											res.redirect('/problems')
-										});
-									})
-								})
-							})
-						})
-					})
-					}
-					else if(website == 'UVA Online Judge'){
-						url = 'https://uhunt.onlinejudge.org/api/p/id/' + pid
-						https.get(url, (response)=>{
-							let body = ''
-							response.on('data', (data)=>{
-								body += data
-							})
-							response.on('end', ()=>{
-								const problem = JSON.parse(body)
-								name = problem.title
-								if(problem.dacu<2000) difficulty = 'Master'
-								else if(problem.dacu>=2000 && problem.dacu<5000) difficulty = 'Expert'
-								else if(problem.dacu>=5000 && problem.dacu<10000) difficulty = 'Specialist'
-								else if(problem.dacu>=10000 && problem.dacu<20000) difficulty = 'Apprentice'
-								else if(problem.dacu>=20000 && problem.dacu<50000) difficulty = 'Novice'
-								else if(problem.dacu>=50000) difficulty = 'Newbie'
-								connection.beginTransaction((err)=>{
-									if(err) throw err
-									connection.query('INSERT INTO problems SET ?', {name: name, link: link, website: website, category: category, Difficulty: difficulty}, function (error, results, fields) {
-										if (error) {
-										  return connection.rollback(function() {
-											throw error;
-										  });
-										}
-										connection.query('INSERT INTO solvedby SET solveCount=0', (err)=>{
-											if (error) {
-												return connection.rollback(function() {
-												  throw error;
-												});
-											}
-											connection.commit(function(err) {
-												if (err) {
-														return connection.rollback(function() {
-														throw err;
-													});
-												}
-												console.log('success!');
-												res.redirect('/problems')
-											});
-										})
-									})
-								})
-							})
-						})
-					
-				}
-			}
-		})
-	}
-	else{
-		res.render('add', {data:{profileName: req.session.name, prob: "details"}})
-	}
-})
-
-app.get('/progress', (req, res)=>{
-	const { id } = req.body
-	let profile = req.session.name
-	let cat = ["Algorithms", "Data Structures", "Brute Force", "Mathematics", "Graphs", "Hashing", "Dynamic Programming", "Sorting", "Recursion", "Number Theory"]
-	let count = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-	let userid = req.session.userid
-	for(let i=0; i<10;i++)
-	{
-		connection.query('SELECT COUNT(problemID) as sc FROM solve WHERE userID=? AND problemID IN(SELECT id FROM PROBLEMS WHERE CATEGORY=?)', [userid, cat[i]], (err, results)=>{
-			// console.log(results);
-			count[i] = results[0].sc
-			// console.log(results[0].sc);
-			if(i==9){
-				console.log(count);
-				res.render('progress', {data: {profileName: profile, solve: count}})
-			}
-		})
-	}
-	// console.log(count);
-	// res.render('progress', {data: {profileName: req.session.name}})
-})
-
-app.put('/rank', (req, res)=>{
-    res.render()
-})
-
-app.get('/profile', (req, res)=>{
-	res.redirect('/profile/'+req.session.userid)
-})
-
-app.get('/profile/:id', function(request, response) {
-	const { id } = request.params
-	// console.log(request.session.name);
-	// console.log(request.session.email);
-	let name, email, bio, solved, rank
-	name = request.session.name
-	email = request.session.email
-	bio = request.session.bio
-	connection.query('SELECT solved FROM users WHERE id = ?', [id], async(err, results)=>{
 			if (err) {
 				console.log(err);
-			} 
+			}
 			else {
 				if (results.length > 0) {
-					// console.log(results)
-					solved = results[0].solved
-					if(solved>=10 && solved <20) rank = 'Newbie'
-					else if(solved>=20 && solved <50) rank = 'Novice'
-					else if(solved>=20 && solved <50) rank = 'Apprentice'
-					else if(solved>=50 && solved <100) rank = 'Specialist'
-					else if(solved>=100 && solved <150) rank = 'Expert'
-					else if(solved>=150 && solved <200) rank = 'Master'
+					// res.send('Email already registered!')
+					res.render('register', { prob: "email" })
+					res.end();
+				} else if (password != passwordConfirm) {
+					// res.send('Passwords do not match!')
+					res.render('register', { prob: "pass" })
+					res.end();
 				}
-				if (request.session.loggedin) {
-					// console.log('bio', bio);
-					// console.log(results);
-					response.render('profile', {data:{ name: name, email: email, bio: bio, solved: solved, rank: rank }} );
-				} else {
-					// Not logged in
-					response.redirect('/login');
+				else {
+					let hashedPassword = await bcrypt.hash(password, 8);
+					console.log(hashedPassword);
+
+					connection.query('INSERT INTO users SET ?', { name: name, email: email, password: hashedPassword, mobile: mobile, address: address }, (err, results) => {
+						if (err) {
+							console.log(err);
+						} else {
+							// res.send('User registered');
+							res.render('login', { prob: "success" })
+							res.end();
+						}
+					})
 				}
-				response.end();
-				
 			}
-		})
-	}
-);
-
-app.get('/edit', (req, res)=>{
-	res.render('edit', {data:{profileName: req.session.name}})
-})
-
-app.post('/edit', (req, res)=>{
-	const {name, bio} = req.body
-	if(name && bio)
-	{
-		connection.query('SELECT * FROM users WHERE name=?', name, (err, results)=>{
-			if(err) throw err;
-			if(results.length>0) res.render('edit', {data:{profileName: req.session.name, prob: "empty"}})
-			else {
-				connection.query('UPDATE users SET ? WHERE id=?',[{name: name, bio: bio}, req.session.userid] , (err, result)=>{
-					req.session.name = name;
-					req.session.bio = bio;
-					res.redirect('/profile')
-				})
-			}
-		})
+		}
+		)
 	}
 	else {
-		res.render('edit', {data:{profileName: req.session.name, prob: "details"}})
+		res.render('register', { prob: "details" })
 	}
 })
 
-app.get('/logout',(req,res)=>{
-	req.session.destroy(function (err) {
-	  	res.redirect('/'); //Inside a callback… bulletproof!
-	 });
+app.post('/regW', async (req, res) => {
+	console.log(req.body);
+	const { name, email, password, passwordConfirm, mobile, district, area, address_details } = req.body;
+	if (name && email && password && passwordConfirm && mobile && district && area && address_details) {
+		connection.query('SELECT email from workshops WHERE email = ?', [email], async (err, results) => {
+			if (err) {
+				console.log(err);
+			}
+			else {
+				if (results.length > 0) {
+					// res.send('Email already registered!')
+					res.render('register', { prob: "email" })
+					res.end();
+				} else if (password != passwordConfirm) {
+					// res.send('Passwords do not match!')
+					res.render('register', { prob: "pass" })
+					res.end();
+				}
+				else {
+					let hashedPassword = await bcrypt.hash(password, 8);
+					console.log(hashedPassword);
+
+					connection.query('INSERT INTO workshops SET ?', { name: name, email: email, mobile: mobile, password: hashedPassword, district: district, area: area, address_details: address_details }, (err, results) => {
+						if (err) {
+							console.log(err);
+						} else {
+							// res.send('Workshop registered');
+							res.render('login', { prob: "success" })
+							res.end();
+						}
+					})
+				}
+			}
+		}
+		)
+	}
+	else {
+		res.render('register', { prob: "details" })
+	}
 })
 
-app.get('/faq', (req, res)=>{
-	if(req.session.loggedin) res.render('faq', {log: 1})
-	else res.render('faq', {log: 0})
-})
 
-app.listen(4000, ()=>{
-    console.log('Server running on port 4000');
+
+app.listen(4000, () => {
+	console.log('Server running on port 4000');
 })
