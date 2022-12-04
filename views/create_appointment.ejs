@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <title>Autohub</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat&family=Pacifico&family=Play&family=Sawarabi+Mincho&family=Ubuntu:wght@300&display=swap"
+            rel="stylesheet">
+
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx"
+            crossorigin="anonymous">
+
+        <link rel="stylesheet" href="css/styles.css">
+    </head>
+
+    <body onload="sortOnLoad()">
+
+        <section id="title">
+
+
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <a id="Knapsack" class="navbar-brand" style="padding: 0 15px;"
+                    href="/home">Autohub</a>
+                <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarTogglerDemo01"
+                    aria-controls="navbarTogglerDemo01" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/uProfile.html"><%=
+                                    data.profileName %></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                    href="/create_appointment">Create
+                                    Appointments</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/search_services">Search
+                                    Services</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/search_parts">Search
+                                    Parts</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/index">Logout</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href=""
+                                    role="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">More</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item"
+                                            href="About-Us.html">About Us</a></li>
+                                    <li><a class="dropdown-item"
+                                            href="Contact.html">Contact Us</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <h1 class="text-center mt-3 mb-3"> Set Appointments</h1>
+                <div class="container-sm">
+
+
+                    <div class="row">
+                        <div class="col-lg-3 prob-categories" style="height:
+                            220px;">
+
+                            <form action="/create_appointment_post"
+                                method="post">
+                                <label style="margin: 30px 0; color: #000;
+                                    font-family: 'Montserrat', sans-serif;
+                                    font-size: 1.5rem; color: #fff; display:
+                                    block; text-align: center;" for="tagsInput">Type
+                                    service name</label>
+                                <div class="search-box" style="margin-top:
+                                    50px">
+                                    <button class="btn-search"><i class="fas
+                                            fa-search"></i></button>
+                                    <input type="text" onkeyup="sort()"
+                                        class="input-search" placeholder="Type
+                                        to Search...">
+                                </div>
+
+                                <h2 style="text-align: center; margin:0;"><button
+                                        type="button" class="btn btn-info"><a
+                                            href="/add" style="color: #fff;">Fix
+                                            Appointment</a></button></h2>
+                            </div>
+                            <div class="col-lg-7">
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <div class="row">
+                                            <div class="col">Services</div>
+                                            <div class="col"></div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table rules=none class="table
+                                                table-bordered problem-table">
+                                                <tr>
+                                                    <th colspan="2"
+                                                        style="text-align:
+                                                        center;">Workshop
+                                                        Email</th>
+                                                    <th>Service</th>
+                                                    <th>Description</th>
+                                                    <th>Price</th>
+                                                </tr>
+                                                <tr>
+                                                    <% if(services.length!=0) {
+                                                        %>
+                                                        <% for(int i=0;i<services.length;i++)
+                                                            { %>
+                                                            <td><%=services[i].workshop_email%></td>
+                                                                <td>
+                                                                    <div
+                                                                        class="form-check
+                                                                        form-check-inline">
+                                                                        <input
+                                                                            class="form-check-input"
+                                                                            type="checkbox"
+                                                                            id="inlineCheckbox1"
+                                                                            name="check_box"
+                                                                            value="<%=services[i].workshop_email
+                                                                            %>">
+                                                                        <label
+                                                                            class="form-check-label"
+                                                                            for="inlineCheckbox1">
+                                                                            <p>Select</p>
+                                                                        </label>
+                                                                    </div>
+                                                                </td>
+                                                                <td><%=services[i].name%></td>
+                                                                    <td><%=services[i].details%></td>
+                                                                        <td><%=services[i].price%></td>
+                                                                        </tr>
+
+                                                                        <% } %>
+                                                                            <% }
+                                                                                %>
+                                                                            </table>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+                                                    <script src="category.js"></script>
+                                                    <script src="sort.js"></script>
+                                                    <script src="solved.js"></script>
+                                                    <script
+                                                        src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/js/all.js"
+                                                        crossorigin="anonymous"></script>
+                                                    <script
+                                                        src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+                                                        integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+                                                        crossorigin="anonymous"></script>
+                                                </body>
+
+                                            </html>
