@@ -40,7 +40,26 @@ app.get('/home', (req, res) => {
 	else res.render('login')
 })
 
-
+app.get('/parts&services',(req,res)=>{
+	if (req.session.loggedin) {
+		let profileName=req.session.name
+		let profileEmail=req.session.email
+		let results1
+		let results2
+		connection.query('SELECT * FROM parts where workshop_email=?',[profileEmail], (err,results)=>{
+			if(err) throw err
+			results1=results
+			console.log(results1)
+			connection.query('SELECT * FROM services where workshop_email=?',[profileEmail], (err,results)=>{
+				if(err) throw err
+				results2=results
+				console.log(results2)
+				res.render('parts&services',{profileName:profileName,parts:results1,services:results2})
+			})
+		})
+	}
+	else res.render('index')
+})
 app.get('/add_parts', (req, res) => {
 	if (req.session.loggedin) {
 		connection.query('SELECT * FROM parts_list', (err,results)=>{
