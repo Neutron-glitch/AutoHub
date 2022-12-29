@@ -1,19 +1,16 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Add Map</title>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-
-    <link rel="stylesheet" type="text/css" href="stylesheets/test.css" />
-
-    <style>
-        #map{
-            height: 100%;
-            width: 80%;
-            margin: 10 auto;
-            
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>finding current location</title>
+  <style>
+    #map{
+      height:500px;
+      width:100%;
+    }
+  </style>
 </head>
 
 <body>
@@ -46,6 +43,20 @@
             markButton.textContent = "Set Location Manually";
             markButton.classList.add("custom-map-control-button");
             map.controls[google.maps.ControlPosition.TOP_CENTER].push(markButton);
+
+            const prevButton = document.createElement("button");
+            prevButton.textContent = "Close Window";
+            prevButton.classList.add("custom-map-control-button");
+            map.controls[google.maps.ControlPosition.TOP_CENTER].push(prevButton);
+            prevButton.style.backgroundColor = "#3456";
+            prevButton.style.border = "2px solid #ff0000";
+
+
+            prevButton.addEventListener("click", () => {
+                infoWindow.close();
+                window.history.back();
+            });
+            
 
 
             locationButton.addEventListener("click", () => {
