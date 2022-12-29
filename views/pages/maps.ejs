@@ -1,11 +1,16 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Add Map</title>
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-
-  <link rel="stylesheet" type="text/css" href="stylesheets/test.css" />
-  <!-- <script type="module" src="routes/index.js"></script> -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>finding current location</title>
+  <style>
+    #map{
+      height:500px;
+      width:100%;
+    }
+  </style>
 </head>
 
 <body>
@@ -70,7 +75,8 @@
     //     }
     //   });
     // }
-
+      
+    console.log("hello");
 
     let map, infoWindow;
 
@@ -170,8 +176,13 @@
      with https://www.npmjs.com/package/@googlemaps/js-api-loader.
     -->
   <script
+    
+
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8vHaaS6apZ1pI7uKyZalr6auRzJ0NuEk&callback=initMap&v=weekly"
-    defer></script>
+    defer>
+     
+     console.log("successful hello");
+    </script>
 </body>
 
 </html>
