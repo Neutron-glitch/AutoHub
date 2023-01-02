@@ -13,9 +13,9 @@ const app = express()
 const connection = mysql.createConnection({
 	host: 'localhost',
 	user: 'root',
-	database: 'ver1',
+	database: 'autohub_database',
 	multipleStatements: true,
-	port: 3307
+	port: 3306
 });
 
 app.use(session({
