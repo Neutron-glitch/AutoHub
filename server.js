@@ -60,6 +60,15 @@ app.get('/parts&services',(req,res)=>{
 	}
 	else res.render('index')
 })
+
+app.get('/fix_appointment',(req,res)=>{
+	if(req.session.loggedin){
+		res.render('fix_appointment',{profileName: req.session.name,location: "abcd"});
+	}
+	else{
+		res.render('index');
+	}
+})
 app.get('/add_parts', (req, res) => {
 	if (req.session.loggedin) {
 		connection.query('SELECT * FROM parts_list', (err,results)=>{
@@ -69,6 +78,43 @@ app.get('/add_parts', (req, res) => {
 		})
 	}
 	else res.render('index')
+})
+app.get('/test',(req,res)=>{
+	res.render('test');
+})
+app.get('/loc',(req,res)=>{
+	if(req.session.loggedin){
+	var position
+	console.log(req.body);
+	res.render('maps',{title: 'Express',session: req.session,position:position});
+	}
+	else{
+		res.render('index');
+	}
+})
+app.post('/postLoc', async (req,res)=>{
+	console.log("HIT")
+	//console.log(req.body);
+	var lat=req.body.lat
+	var long=req.body.long
+	//lat=parseFloat(lat)
+	//long=parseFloat(long)
+	console.log(lat)
+	console.log(long)
+	var email=req.session.email
+	var flag="L"
+	connection.query('Update workshops set `lati`=?,`longi`=? where `email`=?',[lat,long,email],(error,results)=>{
+		if(error) {
+			flag="LX"
+			throw error	
+		}
+		else{
+			flag="L"
+		}
+		console.log("hello");
+		console.log(results);
+	})
+	res.render('wProfile',{profileName:req.session.name, email: req.session.email,mobile:req.session.mobile,prob:flag})
 })
 app.post('/add_parts_post', async (req,res)=>{
 	var {ID,manufacturer,price,quantity,details}=req.body
