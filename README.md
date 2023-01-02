@@ -26,9 +26,10 @@ Implemented Features
 - `show nearest workshops`
 - `get realtime location using Google API`
 - `real time navigation to the workshop from the user`
+- `workshops can maintain a detailed service history`
 
 Future planned Features
-- `home deliery service`
+- `home delivery service`
 - `emergency service`
 - `review and rating`
 
