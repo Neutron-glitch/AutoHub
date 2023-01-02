@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>finding current location</title>
+        <link rel="stylesheet" type="text/css" href="css/styles.css" />
+        <style>
+    #map{
+      height:600px;
+      width:100%;
+    }
+  </style>
+    </head>
+
+
+
+    <body>
+        <!-- <h3>Autohub</h3> -->
+        <!--The div element for the map -->
+
+
+
+        <div id="map"></div>
+        <div>
+            <form action="/postLoc" method="POST" class="loc-form">
+                <input type="hidden" name="lat" id="lat" value="">
+                <input type="hidden" name="long" id="long" value="">
+                <button type="submit" class="location-button">save location</button>
+            </form>
+        </div>
+        <script>
+        let map, infoWindow;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: 23.82, lng: 90.4125 },
+                zoom: 17,
+            });
+            infoWindow = new google.maps.InfoWindow({
+                content: "click the map to get Lat/Lng!",
+                position: { lat: 23.8113, lng: 90.41 },
+            });
+            //console.log(infoWindow.content);
+
+            const locationButton = document.createElement("button");
+            locationButton.textContent = "Go to Current Location";
+            locationButton.classList.add("custom-map-control-button");
+            map.controls[google.maps.ControlPosition.TOP_CENTER].push(locationButton);
+
+            const markButton = document.createElement("button");
+            markButton.textContent = "Set Location Manually";
+            markButton.classList.add("custom-map-control-button");
+            map.controls[google.maps.ControlPosition.TOP_CENTER].push(markButton);
+
+            const prevButton = document.createElement("button");
+            prevButton.textContent = "Close Window";
+            prevButton.classList.add("custom-map-control-button");
+            map.controls[google.maps.ControlPosition.TOP_CENTER].push(prevButton);
+            prevButton.style.backgroundColor = "#3456";
+            prevButton.style.border = "2px solid #ff0000";
+
+
+            prevButton.addEventListener("click", () => {
+                infoWindow.close();
+                window.history.back();
+            });
+            
+
+
+            locationButton.addEventListener("click", () => {
+                // Try HTML5 geolocation.
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const pos = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                            };
+
+                            document.getElementById("lat").value=pos.lat;
+                            document.getElementById("long").value=pos.lng;
+
+                            const infowindow = new google.maps.InfoWindow({
+                                content: "Lat: " + pos.lat + " \n Lng: " + pos.lng,
+                                ariaLabel: "location",
+                            });
+
+                            const marker = new google.maps.Marker({
+                                position: pos,
+                                map: map,
+                                title: "Current location",
+                            });
+
+                            marker.addListener("click", () => {
+                                infowindow.open({
+                                    anchor: marker,
+                                    map: map,
+                                });
+                            });
+
+                            console.log(pos);
+
+                            const contentString =
+                                '<div id="content">' +
+                                '<div id="siteNotice">' +
+                                "</div>" +
+                                '<u><h3 id="firstHeading" class="firstHeading">Location Found</h3></u>' +
+                                '<div id="bodyContent">' +
+                                "<p><b>Latitude :</b> " + pos.lat + "</p>" +
+                                "<p><b>Longitude :</b> " + pos.lng + "</p>" +
+                                "Close this tab to continue or select another location manually" +
+                                "</div>" +
+                                "</div>";
+
+                            infoWindow.setPosition(pos);
+                           // infoWindow.setContent("Location found. Latitude: " + pos.lat + " Longitude: " + pos.lng );
+                            infoWindow.setContent(contentString);
+                            
+                           infoWindow.open(map);
+                            map.setCenter(pos);
+                        },
+                        () => {
+                            handleLocationError(true, infoWindow, map.getCenter());
+                        }
+                    );
+                } else {
+                    // Browser doesn't support Geolocation
+                    handleLocationError(false, infoWindow, map.getCenter());
+                }
+            });
+
+            //configure the click listener.
+            markButton.addEventListener("click", () => {
+
+                map.addListener("click", (mapsMouseEvent) => {
+                    // Close the current InfoWindow.
+                    infoWindow.close();
+
+                    const lat = mapsMouseEvent.latLng.toJSON().lat;
+                    const lng = mapsMouseEvent.latLng.toJSON().lng;
+
+                    document.getElementById("lat").value=lat;
+                    document.getElementById("long").value=lng;
+
+                    // Create a new InfoWindow.
+                    infoWindow = new google.maps.InfoWindow({
+                        position: mapsMouseEvent.latLng,
+                        content: "Lattitude: " + lat + " \ Longitude: " + lng,
+                        ariaLabel: "location",
+                    });
+
+                    // const infowindow2 = new google.maps.InfoWindow({
+                    //     content: "Lat: " + pos.lat + " \n Lng: " + pos.lng,
+                    //     ariaLabel: "location",
+                    // });
+
+                    const marker = new google.maps.Marker({
+                        position: mapsMouseEvent.latLng,
+                        map: map,
+                        title: "Marked location",
+                    });
+
+                    marker.addListener("click", () => {
+                        infoWindow.open({
+                            anchor: marker,
+                            map: map,
+                        });
+                    });
+
+                    // infoWindow.setContent(
+                    //     JSON.stringify(mapsMouseEvent.latLng.toJSON(), null, 2)
+                    // );
+
+
+                    console.log(lat);
+                    console.log(lng);
+                    console.log(mapsMouseEvent.latLng.toJSON());
+
+                    // infoWindow.open(map);
+                });
+            });
+        }
+
+        function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+            infoWindow.setPosition(pos);
+            infoWindow.setContent(
+                browserHasGeolocation
+                    ? "Error: The Geolocation service failed."
+                    : "Error: Your browser doesn't support geolocation."
+            );
+            infoWindow.open(map);
+        }
+
+        window.initMap = initMap;
+
+
+    </script>
+        <script
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8vHaaS6apZ1pI7uKyZalr6auRzJ0NuEk&callback=initMap&v=weekly"
+            defer>
+    </script>
+    </body>
+
+</html>

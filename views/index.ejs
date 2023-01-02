@@ -1,0 +1,72 @@
+<%- include("outer-header") -%>
+
+    <div class="container-fluid">
+      <!-- Title -->
+
+      <div class="row">
+        <div class="col-lg-6 col-md">
+          <br><br><br><br><br><br><br><br><br>
+          <h1>One stop for all Solutions!</h1>
+          <!--button type="button" class="btn btn-outline-light btn-lg dw-btn"><i class="fa-sharp fa-solid fa-code"></i> <a href="/register" style="text-decoration: none;">Start solving</a></button-->
+          <!-- <button type="button" class="btn btn-dark btn-lg dw-btn"><i class="fa-solid fa-mobile-screen"></i> </button> -->
+        </div>
+      </div>
+      <div class="Login">
+          <div class="background">
+            <!-- <div class="shape"></div>
+            <div class="shape"></div> -->
+        </div>
+        <form class="Login-form" action="/auth" method="POST">
+            <h3>Login Here</h3>
+
+            <label for="email" class="Login-label">Email</label>
+            <input type="text" placeholder="abc@gmail.com" id="email" name="email">
+
+            <label class="Login-label" for="password">Password</label>
+            <input type="password" placeholder="Minimum 8-characters" id="password" name="password">
+            <label class="Login-label" for="user-type">Type </label>
+            <select class="select_box" name="selectBox">
+              <option value="car_owner">Car Owner</option>
+              <option value="workshop_owner">Workshop Owner</option>
+            </select>
+            <button type="submit" class="Login-button">Log In</button>
+            <!-- <div class="social">
+                <div class="go"><i class="fab fa-google"></i>  Google</div>
+                <div class="fb"><i class="fab fa-facebook"></i>  Facebook</div>
+            </div> -->
+        </form>
+        </div>
+    </div>
+
+  </section>
+
+
+  <!-- Features -->
+
+  <section id="features">
+    
+    <div class="row">
+      <div class="feature-box col-lg-4">
+        <h3>Go Online with your workshop</h3>
+        <p>Offer your services through online as a workshop</p>
+        <i class="icon fa-solid fa-circle-nodes fa-4x"></i>
+      </div>
+      <div class="feature-box col-lg-4">
+        <h3>More customers for your Workshop</h3>
+        <p>Get more and more customers will be available with increasing number of car owners in your region.</p>
+        <i class="icon fa-sharp fa-solid fa-list-check fa-4x"></i>
+      </div>
+      <div class="feature-box col-lg-4">
+        <h3>Fulfill Appointments.</h3>
+        <p>Fulfill the appointment and get paid instantly.</p>
+        <i class="icon fa-solid fa-wand-sparkles fa-4x"></i>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Press -->
+
+  <hr>
+
+<%- include("footer") -%>
