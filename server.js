@@ -63,7 +63,7 @@ app.get('/parts&services',(req,res)=>{
 
 app.get('/fix_appointment',(req,res)=>{
 	if(req.session.loggedin){
-		res.render('fix_appointment',{profileName: req.session.name,location: "abcd"});
+		res.render('fix_appointment',{profileName: req.session.name,results:""});
 	}
 	else{
 		res.render('index');
@@ -85,12 +85,45 @@ app.get('/test',(req,res)=>{
 app.get('/loc',(req,res)=>{
 	if(req.session.loggedin){
 	var position
-	console.log(req.body);
+	res.render('combined',{title: 'Express',session: req.session,position:position});
+	}
+	else{
+		res.render('index');
+	}
+})
+app.get('/myLoc',(req,res)=>{
+	if(req.session.loggedin){
+	var position
 	res.render('maps',{title: 'Express',session: req.session,position:position});
 	}
 	else{
 		res.render('index');
 	}
+})
+app.post('/postMyLoc', async (req,res)=>{
+	console.log("HIT")
+	//console.log(req.body);
+	var lat=req.body.lat
+	var long=req.body.long
+	//lat=parseFloat(lat)
+	//long=parseFloat(long)
+	console.log(lat)
+	console.log(long)
+	var email=req.session.email
+	console.log(email)
+	var flag="L"
+	connection.query('Update users set `lati`=?,`longi`=? where `email`=?',[lat,long,email],(error,results)=>{
+		if(error) {
+			flag="LX"
+			throw error	
+		}
+		else{
+			flag="L"
+		}
+		console.log("hello");
+		console.log(results);
+	})
+	res.render('uProfile',{profileName:req.session.name, email: req.session.email,mobile:req.session.mobile,prob:flag})
 })
 app.post('/postLoc', async (req,res)=>{
 	console.log("HIT")
@@ -147,6 +180,48 @@ app.post('/add_parts_post', async (req,res)=>{
 		}
 	})
 	
+})
+app.get('/nearWorkshops',(req,res)=>{
+	var lat1,lon1
+	const email=req.session.email
+	if(req.session.loggedin){
+		connection.query('Select lati,longi from users where `email`=?',[email],(err,results)=>{
+			if(err) throw err
+			lat1=results[0].lati
+			lon1=results[0].longi
+			connection.query('Select name,email,lati,longi from workshops',(err,results)=>{
+				if(err) throw err
+				console.log(results.length)
+				let workshops=[]
+				let distances=[]
+				for(let i=0;i<results.length;i++){
+				let lat2 = results[i].lati
+				let lon2 = results[i].longi
+				var R = 6371; // Radius of the earth in km
+				var dLat = (lat2-lat1)*(Math.PI/180);  // deg2rad below
+				var dLon = (lon2-lon1)*(Math.PI/180); 
+				var a = 
+					Math.sin(dLat/2) * Math.sin(dLat/2) +
+					Math.cos((lat1)*(Math.PI/180)) * Math.cos((lat2)*(Math.PI/180)) * 
+					Math.sin(dLon/2) * Math.sin(dLon/2)
+					; 
+				var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+				var d = R * c; // Distance in km
+				var name=results[i].name
+				var email=results[i].email
+				var obj={d,name,email}
+				distances.unshift(obj);
+			}
+			distances.sort((a,b)=>{
+				return a.d-b.d
+			})
+			console.log(distances)
+			res.render('fix_appointment',{profileName: req.session.name,results:distances});
+			})
+		})
+		
+	}
+	else res.render('index')
 })
 app.get('/add_services', (req, res) => {
 	if (req.session.loggedin) {
@@ -238,7 +313,7 @@ app.post('/search_services_post', async (req,res)=>{
 	})
 	
 })
-app.get('/create_appointment', (req, res) => {
+app.get('/create_appointment', async (req, res) => {
 	if (req.session.loggedin){
 		var {service_name}=req.body
 		console.log(req.body)
@@ -341,7 +416,7 @@ app.post('/delete_parts_post', async (req,res)=>{
 
 
 app.get('/uProfile', (req, res) => {
-	if (req.session.loggedin) res.render('uProfile', { data: { profileName: req.session.name, email: req.session.email,mobile:req.session.mobile },prob:"" });
+	if (req.session.loggedin) res.render('uProfile', { profileName: req.session.name, email: req.session.email,mobile:req.session.mobile, prob:"" });
 	else res.render('login',{prob:""})
 })
 app.get('/wProfile', (req, res) => {

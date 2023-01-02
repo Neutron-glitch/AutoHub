@@ -77,33 +77,34 @@
             </ul>
           </div>
         </nav>
-        <% if (prob==="S") { %>
-          <div class="alert alert-success" role="alert">
-            Part Added Successfully
-          </div>
-          <% } %>
-            <% if (prob==="SS") { %>
-              <div class="alert alert-success" role="alert">
-                Service Added Successfully
-              </div>
-              <% } %>
-                <% if (prob==="L") { %>
+
+        <section class="vh-100" style="background-color:
+          #ade8f4;">
+          <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center
+              align-items-center
+              h-100">
+              <div class="col col-lg-6 mb-4 mb-lg-0">
+                <% if (prob==="S") { %>
                   <div class="alert alert-success" role="alert">
-                    Location Added Successfully
+                    Part Added Successfully
                   </div>
                   <% } %>
-                    <% if (prob==="LX") { %>
-                      <div class="alert alert-danger" role="alert">
-                        Location Not Added
+                    <% if (prob==="SS") { %>
+                      <div class="alert alert-success" role="alert">
+                        Service Added Successfully
                       </div>
                       <% } %>
-                        <section class="vh-100" style="background-color:
-                          #ade8f4;">
-                          <div class="container py-5 h-100">
-                            <div class="row d-flex justify-content-center
-                              align-items-center
-                              h-100">
-                              <div class="col col-lg-6 mb-4 mb-lg-0">
+                        <% if (prob==="L") { %>
+                          <div class="alert alert-success" role="alert">
+                            Location Added Successfully
+                          </div>
+                          <% } %>
+                            <% if (prob==="LX") { %>
+                              <div class="alert alert-danger" role="alert">
+                                Location Not Added
+                              </div>
+                              <% } %>
                                 <div class="card mb-3" style="border-radius:
                                   .5rem;">
                                   <div class="row g-0">
