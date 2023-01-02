@@ -85,8 +85,7 @@ app.get('/test',(req,res)=>{
 app.get('/loc',(req,res)=>{
 	if(req.session.loggedin){
 	var position
-	console.log(req.body);
-	res.render('maps',{title: 'Express',session: req.session,position:position});
+	res.render('combined',{title: 'Express',session: req.session,position:position});
 	}
 	else{
 		res.render('index');
