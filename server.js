@@ -69,6 +69,24 @@ app.get('/fix_appointment',(req,res)=>{
 		res.render('index');
 	}
 })
+
+app.post('/fix_appointment_post',(req,res)=>{
+	console.log("post hit")
+	if(req.session.loggedin){
+		const wemail=req.body.workshop
+		const uemail=req.session.email
+		var formatedMysqlString = (new Date ((new Date((new Date(new Date())).toISOString() )).getTime() - ((new Date()).getTimezoneOffset()*60000))).toISOString().slice(0, 19).replace('T', ' ');
+		console.log( formatedMysqlString );
+		console.log(req.body);
+		connection.query('insert into appointments set ?',{workshop_email:wemail,user_email:uemail,appointment_time:formatedMysqlString},(err,results)=>{
+			if(err) throw err
+			res.render('uProfile',{ profileName: req.session.name, email: req.session.email,mobile:req.session.mobile, prob:"appointment_fixed",results:""});
+		})
+	}
+	else{
+		res.render('uProfile',{ profileName: req.session.name, email: req.session.email,mobile:req.session.mobile, prob:"appointment_not_fixed",results:""});
+	}
+})
 app.get('/add_parts', (req, res) => {
 	if (req.session.loggedin) {
 		connection.query('SELECT * FROM parts_list', (err,results)=>{
