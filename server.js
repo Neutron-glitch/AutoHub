@@ -4,7 +4,8 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs')
 const path = require('path');
-const https = require('https')
+const https = require('https');
+const { connect } = require('http2');
 
 
 const app = express()
@@ -36,7 +37,12 @@ app.set('view engine', 'ejs')
 
 
 app.get('/home', (req, res) => {
-	if (req.session.loggedin) res.render('wProfile', {profileName: req.session.name, email: req.session.email });
+	if (req.session.loggedin) {
+		connection.query('select * from appointments where completion_time IS NULL',(err,results)=>{
+			if(err) throw err
+			res.render('wProfile',{  profileName: req.session.name, email: req.session.email,mobile:req.session.mobile,appointments:results,num:services_num,prob:"" })
+		})
+	}
 	else res.render('login')
 })
 
@@ -63,10 +69,31 @@ app.get('/parts&services',(req,res)=>{
 
 app.get('/fix_appointment',(req,res)=>{
 	if(req.session.loggedin){
-		res.render('fix_appointment',{profileName: req.session.name,location: "abcd"});
+		res.render('fix_appointment',{profileName: req.session.name,results:""});
 	}
 	else{
 		res.render('index');
+	}
+})
+
+app.post('/fix_appointment_post',(req,res)=>{
+	console.log("post hit")
+	if(req.session.loggedin){
+		const wemail=req.body.workshop
+		const uemail=req.session.email
+		var formatedMysqlString = (new Date ((new Date((new Date(new Date())).toISOString() )).getTime() - ((new Date()).getTimezoneOffset()*60000))).toISOString().slice(0, 19).replace('T', ' ');
+		console.log( formatedMysqlString );
+		console.log(req.body);
+		connection.query('insert into appointments set ?',{workshop_email:wemail,user_email:uemail,appointment_time:formatedMysqlString},(err,results)=>{
+			if(err) throw err
+			connection.query('select * from appointments where `user_email`=?',[req.session.email],(err,results)=>{
+				if(err) throw err
+				res.render('uProfile', { profileName: req.session.name, email: req.session.email,mobile:req.session.mobile,appointments:results, prob:"" });
+			})
+		})
+	}
+	else{
+		res.render('uProfile',{ profileName: req.session.name, email: req.session.email,mobile:req.session.mobile,appointments:results, prob:"appointment_not_fixed",results:""});
 	}
 })
 app.get('/add_parts', (req, res) => {
@@ -76,6 +103,48 @@ app.get('/add_parts', (req, res) => {
 			let profile = req.session.name
 			res.render('practice-add_parts',{ profileName: profile, parts: results,prob:""})
 		})
+	}
+	else res.render('index')
+})
+app.get('/nearestRoute',(req,res)=>{
+	var lat1,lon1
+	const email=req.session.email
+	if(req.session.loggedin){
+		connection.query('Select lati,longi from users where `email`=?',[email],(err,results)=>{
+			if(err) throw err
+			lat1=results[0].lati
+			lon1=results[0].longi
+			connection.query('Select name,email,lati,longi from workshops',(err,results)=>{
+				if(err) throw err
+				console.log(results.length)
+				let workshops=[]
+				let distances=[]
+				for(let i=0;i<results.length;i++){
+				let lat2 = results[i].lati
+				let lon2 = results[i].longi
+				var R = 6371; // Radius of the earth in km
+				var dLat = (lat2-lat1)*(Math.PI/180);  // deg2rad below
+				var dLon = (lon2-lon1)*(Math.PI/180); 
+				var a = 
+					Math.sin(dLat/2) * Math.sin(dLat/2) +
+					Math.cos((lat1)*(Math.PI/180)) * Math.cos((lat2)*(Math.PI/180)) * 
+					Math.sin(dLon/2) * Math.sin(dLon/2)
+					; 
+				var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+				var d = R * c; // Distance in km
+				var name=results[i].name
+				var email=results[i].email
+				var obj={d,name,email,lat2,lon2}
+				distances.unshift(obj);
+			}
+			distances.sort((a,b)=>{
+				return a.d-b.d
+			})
+			console.log(distances)
+			res.render('mappo',{profileName: req.session.name,result:distances[0]});
+			})
+		})
+		
 	}
 	else res.render('index')
 })
@@ -90,6 +159,43 @@ app.get('/loc',(req,res)=>{
 	else{
 		res.render('index');
 	}
+})
+app.get('/myLoc',(req,res)=>{
+	if(req.session.loggedin){
+	var position
+	res.render('maps',{title: 'Express',session: req.session,position:position});
+	}
+	else{
+		res.render('index');
+	}
+})
+app.post('/postMyLoc', async (req,res)=>{
+	console.log("HIT")
+	//console.log(req.body);
+	var lat=req.body.lat
+	var long=req.body.long
+	//lat=parseFloat(lat)
+	//long=parseFloat(long)
+	console.log(lat)
+	console.log(long)
+	var email=req.session.email
+	console.log(email)
+	var flag="L"
+	connection.query('Update users set `lati`=?,`longi`=? where `email`=?',[lat,long,email],(error,results)=>{
+		if(error) {
+			flag="LX"
+			throw error	
+		}
+		else{
+			flag="L"
+		}
+		console.log("hello");
+		console.log(results);
+		connection.query('select * from appointments where `user_email`=?',[req.session.email],(err,results)=>{
+			if(err) throw err
+			res.render('uProfile', { profileName: req.session.name, email: req.session.email,mobile:req.session.mobile,appointments:results, prob:"" });
+		})
+	})
 })
 app.post('/postLoc', async (req,res)=>{
 	console.log("HIT")
@@ -112,8 +218,11 @@ app.post('/postLoc', async (req,res)=>{
 		}
 		console.log("hello");
 		console.log(results);
+		connection.query('select * from appointments where completion_time IS NULL',(err,results)=>{
+			if(err) throw err
+			res.render('wProfile',{  profileName: req.session.name, email: req.session.email,mobile:req.session.mobile,appointments:results,num:services_num,prob:"" })
+		})
 	})
-	res.render('wProfile',{profileName:req.session.name, email: req.session.email,mobile:req.session.mobile,prob:flag})
 })
 app.post('/add_parts_post', async (req,res)=>{
 	var {ID,manufacturer,price,quantity,details}=req.body
@@ -138,14 +247,59 @@ app.post('/add_parts_post', async (req,res)=>{
 								throw err;
 							});
 						}
+						connection.query('select * from appointments where completion_time IS NULL',(err,results)=>{
+							if(err) throw err
+							res.render('wProfile',{  profileName: req.session.name, email: req.session.email,mobile:req.session.mobile,appointments:results,num:services_num,prob:"" })
+						})
 					})
 
-					res.render('wProfile',{profileName:req.session.name, email: req.session.email,mobile:req.session.mobile,prob:"S"})
 				}
 			})
 		}
 	})
 	
+})
+app.get('/nearWorkshops',(req,res)=>{
+	var lat1,lon1
+	const email=req.session.email
+	if(req.session.loggedin){
+		connection.query('Select lati,longi from users where `email`=?',[email],(err,results)=>{
+			if(err) throw err
+			lat1=results[0].lati
+			lon1=results[0].longi
+			connection.query('Select name,email,lati,longi from workshops',(err,results)=>{
+				if(err) throw err
+				console.log(results.length)
+				let workshops=[]
+				let distances=[]
+				for(let i=0;i<results.length;i++){
+				let lat2 = results[i].lati
+				let lon2 = results[i].longi
+				var R = 6371; // Radius of the earth in km
+				var dLat = (lat2-lat1)*(Math.PI/180);  // deg2rad below
+				var dLon = (lon2-lon1)*(Math.PI/180); 
+				var a = 
+					Math.sin(dLat/2) * Math.sin(dLat/2) +
+					Math.cos((lat1)*(Math.PI/180)) * Math.cos((lat2)*(Math.PI/180)) * 
+					Math.sin(dLon/2) * Math.sin(dLon/2)
+					; 
+				var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+				var d = R * c; // Distance in km
+				var name=results[i].name
+				var email=results[i].email
+				var obj={d,name,email}
+				distances.unshift(obj);
+			}
+			distances.sort((a,b)=>{
+				return a.d-b.d
+			})
+			console.log(distances)
+			res.render('fix_appointment',{profileName: req.session.name,results:distances});
+			})
+		})
+		
+	}
+	else res.render('index')
 })
 app.get('/add_services', (req, res) => {
 	if (req.session.loggedin) {
@@ -181,7 +335,10 @@ app.post('/add_services_post', async (req,res)=>{
 							});
 						}
 					})
-					res.render('wProfile',{profileName:req.session.name, email: req.session.email,mobile:req.session.mobile,prob:"SS"})
+					connection.query('select * from appointments where completion_time IS NULL',(err,results)=>{
+						if(err) throw err
+						res.render('wProfile',{  profileName: req.session.name, email: req.session.email,mobile:req.session.mobile,appointments:results,num:services_num,prob:"" })
+					})
 				}
 			})
 		}
@@ -237,7 +394,7 @@ app.post('/search_services_post', async (req,res)=>{
 	})
 	
 })
-app.get('/create_appointment', (req, res) => {
+app.get('/create_appointment', async (req, res) => {
 	if (req.session.loggedin){
 		var {service_name}=req.body
 		console.log(req.body)
@@ -269,6 +426,20 @@ app.post('/create_appointment_post', async (req,res)=>{
 			console.log(results)
 			res.render('search_services',{service_name: service_name,services:results ,profileName: req.session.name, email: req.session.email,mobile:req.session.mobile ,prob :"S" })
 		}
+	})
+	
+})
+app.post('/complete_appointment', async (req,res)=>{
+	console.log("post hit")
+	const appointment_id=req.body.appointment_id
+	const email=req.session.email
+	var sqlDatetime = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60 * 1000).toJSON().slice(0, 19).replace('T', ' ');
+	 connection.query('Update appointments set `completion_time`=? where `ID`=?',[sqlDatetime,appointment_id],(error,results,fields)=>{
+		if(error) throw error
+		connection.query('select * from appointments where completion_time IS NULL',(err,results)=>{
+			if(err) throw err
+			res.render('wProfile',{  profileName: req.session.name, email: req.session.email,mobile:req.session.mobile,appointments:results,num:4,prob:"appointment_finish" })
+		})
 	})
 	
 })
@@ -340,7 +511,14 @@ app.post('/delete_parts_post', async (req,res)=>{
 
 
 app.get('/uProfile', (req, res) => {
-	if (req.session.loggedin) res.render('uProfile', { data: { profileName: req.session.name, email: req.session.email,mobile:req.session.mobile },prob:"" });
+	if (req.session.loggedin) {
+		connection.query('select * from appointments where `user_email`=?',[req.session.email],(err,results)=>{
+			if(err) throw err
+			console.log(results)
+			res.render('uProfile', { profileName: req.session.name, email: req.session.email,mobile:req.session.mobile,appointments:results, prob:"" });
+		})
+		
+	}
 	else res.render('login',{prob:""})
 })
 app.get('/wProfile', (req, res) => {
@@ -351,7 +529,11 @@ app.get('/wProfile', (req, res) => {
 			console.log(results)
 			let services_num=Object.values(results[0])[0]
 			console.log(services_num)
-			res.render('wProfile', {  profileName: req.session.name, email: req.session.email,mobile:req.session.mobile,num:services_num,prob:"" });
+			connection.query('select * from appointments where completion_time IS NULL',(err,results)=>{
+				if(err) throw err
+				console.log(results)
+				res.render('wProfile',{  profileName: req.session.name, email: req.session.email,mobile:req.session.mobile,appointments:results,num:services_num,prob:"" })
+			})
 		})
 
 	}
