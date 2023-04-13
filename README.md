@@ -50,6 +50,16 @@ https://user-images.githubusercontent.com/61306531/231844857-9b9f0357-eb48-4d05-
 
 https://user-images.githubusercontent.com/61306531/231848085-f7c09870-be47-42b1-84ef-a78f3e536825.mp4
 
+#### Creating Appointments
+1. **From the listed nearby workshops appointments can be made**
+2. They can see their real time location on the map
+3. Real time route(cycling,driving etc) can be seen of the nearest workshop
+
+
+
+
+https://user-images.githubusercontent.com/61306531/231859446-bacfd143-d728-43e8-9111-df7af3133794.mp4
+
 
 
 
