@@ -55,11 +55,14 @@ https://user-images.githubusercontent.com/61306531/231848085-f7c09870-be47-42b1-
 2. They can see their real time location on the map
 3. Real time route(cycling,driving etc) can be seen of the nearest workshop
 
-
-
-
 https://user-images.githubusercontent.com/61306531/231859446-bacfd143-d728-43e8-9111-df7af3133794.mp4
 
+
+#### Accepting appointments
+
+Marking the appointment as completed which was done in the previous portion. The starting and the ending time was updated here.
+
+https://user-images.githubusercontent.com/61306531/231865503-c034544a-a1ea-4ec6-9ee8-05fc2fd4a90f.mp4
 
 
 
