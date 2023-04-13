@@ -34,4 +34,28 @@ Future planned Features
 - `review and rating`
 
 
+## Demonstration
+
+#### Sign up as user 
+https://user-images.githubusercontent.com/61306531/231840968-67db3a8c-6404-473a-8bae-50eb2d5710cc.mp4
+
+#### Sign up as workshop
+**The workshop can set their location in 2 ways:**
+ 1. `Automatically using real time location`
+ 2. `Manually set by the workshop admin`
+
+https://user-images.githubusercontent.com/61306531/231844857-9b9f0357-eb48-4d05-b093-88f86bac65f3.mp4
+
+#### Adding parts and services by workshop
+
+https://user-images.githubusercontent.com/61306531/231848085-f7c09870-be47-42b1-84ef-a78f3e536825.mp4
+
+
+
+
+
+
+
+
+
 
